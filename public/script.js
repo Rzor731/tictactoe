@@ -1,13 +1,13 @@
 // Firebase Configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyA0cRZC5PbgBH5voliUETIElW-GP3ZcU6k",
-    authDomain: "ttt-project-2819a.firebaseapp.com",
-    databaseURL: "https://ttt-project-2819a-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "ttt-project-2819a",
-    storageBucket: "ttt-project-2819a.firebasestorage.app",
-    messagingSenderId: "48715409415",
-    appId: "1:48715409415:web:e53a5f4ff5d460a7b622a2",
-    measurementId: "G-NFWXDTXLW1"
+  apiKey: "AIzaSyA0cRZC5PbgBH5voliUETIElW-GP3ZcU6k",
+  authDomain: "ttt-project-2819a.firebaseapp.com",
+  databaseURL: "https://ttt-project-2819a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ttt-project-2819a",
+  storageBucket: "ttt-project-2819a.firebasestorage.app",
+  messagingSenderId: "48715409415",
+  appId: "1:48715409415:web:e53a5f4ff5d460a7b622a2",
+  measurementId: "G-NFWXDTXLW1"
 };
 
 // Initialize Firebase
