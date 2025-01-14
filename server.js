@@ -4,7 +4,6 @@ const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: process.env.PORT || 8080 });
 
 let games = {}; // Menyimpan informasi permainan yang sedang berlangsung
-let players = {}; // Menyimpan informasi pemain
 
 // Fungsi untuk mengirimkan pembaruan kepada kedua pemain
 function broadcast(gameId, message) {
@@ -25,15 +24,21 @@ wss.on('connection', ws => {
   ws.on('message', message => {
     const data = JSON.parse(message);
 
-    // Jika pemain baru, buat permainan baru
-    if (data.type === 'join') {
+    // Jika pemain baru ingin membuat room
+    if (data.type === 'createRoom') {
       const gameId = data.gameId;
       if (!games[gameId]) {
         games[gameId] = { board: Array(9).fill(null), players: [] };
+        ws.send(JSON.stringify({ type: 'roomCreated', gameId }));
+      } else {
+        ws.send(JSON.stringify({ type: 'roomError', message: 'Room already exists' }));
       }
+    }
 
-      // Tentukan pemain dan simbol mereka
-      if (games[gameId].players.length < 2) {
+    // Jika pemain ingin bergabung ke room yang sudah ada
+    if (data.type === 'joinRoom') {
+      const gameId = data.gameId;
+      if (games[gameId] && games[gameId].players.length < 2) {
         currentGameId = gameId;
         currentPlayer = games[gameId].players.length === 0 ? 'X' : 'O';
         games[gameId].players.push(ws);
@@ -41,6 +46,8 @@ wss.on('connection', ws => {
 
         // Kirim pembaruan papan ke kedua pemain
         broadcast(gameId, { type: 'update', board: games[gameId].board });
+      } else {
+        ws.send(JSON.stringify({ type: 'roomError', message: 'Room is full or does not exist' }));
       }
     }
 
