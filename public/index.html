@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe - Multiplayer</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    .board { display: grid; grid-template-columns: repeat(3, 100px); grid-gap: 10px; margin: 20px auto; }
+    .cell { width: 100px; height: 100px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; }
+    .cell:active { background: #ddd; }
+    #status { margin-top: 20px; font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+
+<h1>Tic Tac Toe Multiplayer</h1>
+<div id="status">Waiting for opponent...</div>
+<div class="board" id="board"></div>
+
+<script>
+  const boardElement = document.getElementById('board');
+  const statusElement = document.getElementById('status');
+  let ws;
+  let playerSymbol;
+  const gameId = prompt('Enter game ID (e.g., game1):');
+
+  // Membuat koneksi WebSocket ke server
+  ws = new WebSocket('wss://' + window.location.host);
+
+  // Menunggu koneksi dan bergabung ke permainan
+  ws.onopen = () => {
+    ws.send(JSON.stringify({ type: 'join', gameId }));
+  };
+
+  // Menangani pesan dari server
+  ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    if (message.type === 'start') {
+      playerSymbol = message.player;
+      statusElement.textContent = `You are player ${playerSymbol}.`;
+    }
+    if (message.type === 'update') {
+      updateBoard(message.board);
+    }
+    if (message.type === 'win') {
+      statusElement.textContent = `Player ${message.winner} wins!`;
+    }
+  };
+
+  // Mengupdate papan permainan
+  function updateBoard(board) {
+    boardElement.innerHTML = '';
+    board.forEach((cell, index) => {
+      const cellElement = document.createElement('div');
+      cellElement.classList.add('cell');
+      cellElement.textContent = cell;
+      cellElement.onclick = () => makeMove(index);
+      boardElement.appendChild(cellElement);
+    });
+  }
+
+  // Mengirim gerakan pemain ke server
+  function makeMove(index) {
+    if (playerSymbol && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'move', gameId, index }));
+    }
+  }
+</script>
+
+</body>
+</html>
